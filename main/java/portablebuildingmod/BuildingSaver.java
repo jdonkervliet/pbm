@@ -1,5 +1,8 @@
 package portablebuildingmod;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
@@ -7,11 +10,13 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-public class FastBuilder {
+public class BuildingSaver {
+
+	public static String BUILDING_DIR = "/tmp/";
 
 	World world;
 
-	public FastBuilder() {
+	public BuildingSaver() {
 		this.world = MinecraftServer.getServer().getEntityWorld();
 	}
 
@@ -22,7 +27,7 @@ public class FastBuilder {
 
 	public void saveRelative(String name, int forward, int right, int up) {
 		Position offset = relativeToAbsoluteOffset(forward, right, up);
-		save(offset.x, offset.y, offset.z);
+		save(name, offset.x, offset.y, offset.z);
 	}
 
 	public void delete(int xdir, int ydir, int zdir) {
@@ -39,8 +44,14 @@ public class FastBuilder {
 		}
 	}
 
-	public void save(int xdir, int ydir, int zdir) {
-		// FIXME Open file
+	public void save(String name, int xdir, int ydir, int zdir) {
+		PrintWriter writer = null;
+
+		try {
+			writer = new PrintWriter(BUILDING_DIR + name);
+		} catch (FileNotFoundException e) {
+			// FIXME care about this.
+		}
 
 		Tuple xTuple = getIncreasingRange(xdir);
 		Tuple yTuple = getIncreasingRange(ydir);
@@ -50,11 +61,18 @@ public class FastBuilder {
 			for (int z = zTuple.start; z < zTuple.end; z++) {
 				for (int y = yTuple.start; y < yTuple.end; y++) {
 					// FIXME Write to file
+					BlockPos basepos = blockInCrosshair();
+					BlockPos pos = blockInCrosshair().add(x, y, z);
+					int blockid = Block.getIdFromBlock(world.getBlockState(pos)
+							.getBlock());
+					writer.println(String.format("%d,%d,%d,%d", pos.getX()
+							- basepos.getX(), pos.getY() - basepos.getY(),
+							pos.getZ() - basepos.getZ(), blockid));
 				}
 			}
 		}
 
-		// FIXME Close file
+		writer.close();
 	}
 
 	private Tuple getIncreasingRange(int number) {

@@ -11,10 +11,10 @@ public class CommandParser {
 	public static final String MOD_DELETE_COMMAND = "delete";
 	public static final String MOD_SAVE_COMMAND = "save";
 
-	private FastBuilder builder;
+	private BuildingSaver builder;
 
 	public CommandParser(World world) {
-		this.builder = new FastBuilder();
+		this.builder = new BuildingSaver();
 	}
 
 	public void parseCommand(List<String> command) {
@@ -24,6 +24,7 @@ public class CommandParser {
 			} else if (command.get(0).equals(MOD_SAVE_COMMAND)) {
 				parseSaveCommand(command.subList(1, command.size()));
 			} else {
+				System.out.println("[[[");
 				throw new InvalidPBMCommandException();
 			}
 		} catch (InvalidPBMCommandException e) {
@@ -33,7 +34,7 @@ public class CommandParser {
 
 	private void parseSaveCommand(List<String> command)
 			throws InvalidPBMCommandException {
-		if (command.size() == 4 && command.get(0).matches("/w+")) {
+		if (command.size() == 4 && command.get(0).matches("\\w+")) {
 			String name = command.get(0);
 			int forward, right, up;
 			try {
@@ -41,16 +42,18 @@ public class CommandParser {
 				right = Integer.parseInt(command.get(2));
 				up = Integer.parseInt(command.get(3));
 			} catch (NumberFormatException e) {
+				System.out.println("###");
 				throw new InvalidPBMCommandException();
 			}
 
 			builder.saveRelative(name, forward, right, up);
 		} else {
+			System.out.println("@@@");
 			throw new InvalidPBMCommandException();
 		}
 	}
 
-	public void parseDeleteCommand(List<String> command)
+	private void parseDeleteCommand(List<String> command)
 			throws InvalidPBMCommandException {
 		if (command.size() == 3) {
 			int forward, right, up;
