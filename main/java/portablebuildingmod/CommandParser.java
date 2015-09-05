@@ -1,5 +1,7 @@
 package portablebuildingmod;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
@@ -10,6 +12,7 @@ public class CommandParser {
 
 	public static final String MOD_DELETE_COMMAND = "delete";
 	public static final String MOD_SAVE_COMMAND = "save";
+	public static final String MOD_BUILD_COMMAND = "build";
 
 	private BuildingSaver builder;
 
@@ -23,6 +26,8 @@ public class CommandParser {
 				parseDeleteCommand(command.subList(1, command.size()));
 			} else if (command.get(0).equals(MOD_SAVE_COMMAND)) {
 				parseSaveCommand(command.subList(1, command.size()));
+			} else if (command.get(0).equals(MOD_BUILD_COMMAND)) {
+				parseBuildCommand(command.subList(1, command.size()));
 			} else {
 				System.out.println("[[[");
 				throw new InvalidPBMCommandException();
@@ -65,6 +70,26 @@ public class CommandParser {
 				throw new InvalidPBMCommandException();
 			}
 			builder.deleteRelative(forward, right, up);
+		} else {
+			throw new InvalidPBMCommandException();
+		}
+	}
+
+	private void parseBuildCommand(List<String> command)
+			throws InvalidPBMCommandException {
+		System.out.println("Build command.");
+		if (command.size() == 1) {
+			if (new File(BuildingSaver.BUILDING_DIR + command.get(0)).exists()) {
+				System.out.println("Calling build.");
+				try {
+					builder.build(command.get(0));
+				} catch (FileNotFoundException e) {
+					// FIXME This should not happen, we just checked.
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Cannot find file " + command.get(0));
+			}
 		} else {
 			throw new InvalidPBMCommandException();
 		}

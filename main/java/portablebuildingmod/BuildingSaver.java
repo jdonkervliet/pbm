@@ -1,9 +1,12 @@
 package portablebuildingmod;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
@@ -75,6 +78,31 @@ public class BuildingSaver {
 		writer.close();
 	}
 
+	public void build(String name) throws FileNotFoundException {
+		BlockPos crosshairPos = blockInCrosshair();
+		System.out.println("Building at " + crosshairPos);
+
+		Scanner scanner = new Scanner(new File(BUILDING_DIR + name));
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			System.out.println("Reading line " + line);
+			String[] lineparts = line.split(",");
+
+			int xoffset = Integer.parseInt(lineparts[0]);
+			int yoffset = Integer.parseInt(lineparts[1]);
+			int zoffset = Integer.parseInt(lineparts[2]);
+			int blockType = Integer.parseInt(lineparts[3]);
+
+			BlockPos placementPos = relativeToAbsoluteOffset(
+					new Position(crosshairPos.add(xoffset, yoffset, zoffset)))
+					.toBlockPos();
+			IBlockState block = Block.getStateById(blockType);
+			System.out.println("Putting " + block + " at " + placementPos);
+			world.setBlockState(placementPos, block);
+		}
+		scanner.close();
+	}
+
 	private Tuple getIncreasingRange(int number) {
 		if (number > 0) {
 			return new Tuple(0, number);
@@ -94,6 +122,10 @@ public class BuildingSaver {
 		Block block = world.getBlockState(pos).getBlock();
 		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
 		world.setBlockToAir(pos);
+	}
+
+	private Position relativeToAbsoluteOffset(Position p) {
+		return relativeToAbsoluteOffset(p.x, p.z, p.y);
 	}
 
 	private Position relativeToAbsoluteOffset(int forward, int right, int up) {
@@ -138,6 +170,22 @@ public class BuildingSaver {
 
 	public class Position {
 		protected int x, y, z;
+
+		public Position() {
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+		}
+
+		public Position(BlockPos blockPos) {
+			this.x = blockPos.getX();
+			this.y = blockPos.getY();
+			this.z = blockPos.getZ();
+		}
+
+		public BlockPos toBlockPos() {
+			return new BlockPos(x, y, z);
+		}
 	}
 
 }
