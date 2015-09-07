@@ -23,7 +23,7 @@ public class BuildingSaver {
 		this.world = MinecraftServer.getServer().getEntityWorld();
 	}
 
-	public void deleteRelative(int forward, int right, int up) {
+	public void delete(int forward, int right, int up) {
 		Tuple forwardTuple = getIncreasingRange(forward);
 		Tuple upTuple = getIncreasingRange(up);
 		Tuple rightTuple = getIncreasingRange(right);
@@ -38,7 +38,7 @@ public class BuildingSaver {
 		}
 	}
 
-	public void saveRelative(String name, int forward, int right, int up) {
+	public void save(String name, int forward, int right, int up) {
 		PrintWriter writer = null;
 
 		try {

@@ -50,7 +50,7 @@ public class CommandParser {
 				throw new InvalidPBMCommandException();
 			}
 
-			builder.saveRelative(name, forward, right, up);
+			builder.save(name, forward, right, up);
 		} else {
 			throw new InvalidPBMCommandException();
 		}
@@ -67,7 +67,7 @@ public class CommandParser {
 			} catch (NumberFormatException e) {
 				throw new InvalidPBMCommandException();
 			}
-			builder.deleteRelative(forward, right, up);
+			builder.delete(forward, right, up);
 		} else {
 			throw new InvalidPBMCommandException();
 		}
