@@ -24,30 +24,21 @@ public class BuildingSaver {
 	}
 
 	public void deleteRelative(int forward, int right, int up) {
-		BlockPos offset = relativeToAbsoluteOffset(forward, right, up);
-		delete(offset.getX(), offset.getY(), offset.getZ());
-	}
+		Tuple forwardTuple = getIncreasingRange(forward);
+		Tuple upTuple = getIncreasingRange(up);
+		Tuple rightTuple = getIncreasingRange(right);
 
-	public void saveRelative(String name, int forward, int right, int up) {
-		BlockPos offset = relativeToAbsoluteOffset(forward, right, up);
-		save(name, offset.getX(), offset.getY(), offset.getZ());
-	}
-
-	public void delete(int xdir, int ydir, int zdir) {
-		Tuple xTuple = getIncreasingRange(xdir);
-		Tuple yTuple = getIncreasingRange(ydir);
-		Tuple zTuple = getIncreasingRange(zdir);
-
-		for (int x = xTuple.start; x < xTuple.end; x++) {
-			for (int z = zTuple.start; z < zTuple.end; z++) {
-				for (int y = yTuple.start; y < yTuple.end; y++) {
-					breakBlock(blockInCrosshair().add(x, y, z));
+		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
+			for (int r = rightTuple.start; r < rightTuple.end; r++) {
+				for (int u = upTuple.start; u < upTuple.end; u++) {
+					breakBlock(blockInCrosshair().add(
+							relativeToAbsoluteOffset(f, r, u)));
 				}
 			}
 		}
 	}
 
-	public void save(String name, int xdir, int ydir, int zdir) {
+	public void saveRelative(String name, int forward, int right, int up) {
 		PrintWriter writer = null;
 
 		try {
@@ -56,21 +47,22 @@ public class BuildingSaver {
 			// FIXME care about this.
 		}
 
-		Tuple xTuple = getIncreasingRange(xdir);
-		Tuple yTuple = getIncreasingRange(ydir);
-		Tuple zTuple = getIncreasingRange(zdir);
+		Tuple forwardTuple = getIncreasingRange(forward);
+		Tuple upTuple = getIncreasingRange(up);
+		Tuple rightTuple = getIncreasingRange(right);
+		BlockPos basepos = blockInCrosshair();
 
-		for (int x = xTuple.start; x < xTuple.end; x++) {
-			for (int z = zTuple.start; z < zTuple.end; z++) {
-				for (int y = yTuple.start; y < yTuple.end; y++) {
+		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
+			for (int r = rightTuple.start; r < rightTuple.end; r++) {
+				for (int u = upTuple.start; u < upTuple.end; u++) {
 					// FIXME Write to file
-					BlockPos basepos = blockInCrosshair();
-					BlockPos pos = blockInCrosshair().add(x, y, z);
+					BlockPos pos = basepos
+							.add(relativeToAbsoluteOffset(f, r, u));
+
 					int blockid = Block.getIdFromBlock(world.getBlockState(pos)
 							.getBlock());
-					writer.println(String.format("%d,%d,%d,%d", pos.getX()
-							- basepos.getX(), pos.getY() - basepos.getY(),
-							pos.getZ() - basepos.getZ(), blockid));
+					writer.println(String.format("%d,%d,%d,%d", f, r, u,
+							blockid));
 				}
 			}
 		}
@@ -93,13 +85,13 @@ public class BuildingSaver {
 			System.out.println("Reading line " + line);
 			String[] lineparts = line.split(",");
 
-			int xoffset = Integer.parseInt(lineparts[0]);
-			int yoffset = Integer.parseInt(lineparts[1]);
-			int zoffset = Integer.parseInt(lineparts[2]);
+			int forwardOffset = Integer.parseInt(lineparts[0]);
+			int upOffset = Integer.parseInt(lineparts[1]);
+			int rightOffset = Integer.parseInt(lineparts[2]);
 			int blockType = Integer.parseInt(lineparts[3]);
 
-			BlockPos offset = absoluteToRelativeOffset(xoffset, yoffset,
-					zoffset);
+			BlockPos offset = relativeToAbsoluteOffset(forwardOffset, upOffset,
+					rightOffset);
 			BlockPos placementPos = crosshairPos.add(offset);
 			IBlockState block = Block.getStateById(blockType);
 			System.out.println("Putting " + block + " at " + placementPos);
@@ -127,10 +119,6 @@ public class BuildingSaver {
 		Block block = world.getBlockState(pos).getBlock();
 		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
 		world.setBlockToAir(pos);
-	}
-
-	private BlockPos absoluteToRelativeOffset(int x, int y, int z) {
-		return relativeToAbsoluteOffset(z, x, y);
 	}
 
 	private BlockPos relativeToAbsoluteOffset(int forward, int right, int up) {
