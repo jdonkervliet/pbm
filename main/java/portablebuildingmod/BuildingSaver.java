@@ -27,12 +27,13 @@ public class BuildingSaver {
 		Tuple forwardTuple = getIncreasingRange(forward);
 		Tuple upTuple = getIncreasingRange(up);
 		Tuple rightTuple = getIncreasingRange(right);
+		BlockPos crosshairBlock = blockInCrosshair();
 
 		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
 			for (int r = rightTuple.start; r < rightTuple.end; r++) {
 				for (int u = upTuple.start; u < upTuple.end; u++) {
-					breakBlock(blockInCrosshair().add(
-							relativeToAbsoluteOffset(f, r, u)));
+					breakBlock(crosshairBlock.add(relativeToAbsoluteOffset(f,
+							r, u)));
 				}
 			}
 		}
@@ -50,14 +51,14 @@ public class BuildingSaver {
 		Tuple forwardTuple = getIncreasingRange(forward);
 		Tuple upTuple = getIncreasingRange(up);
 		Tuple rightTuple = getIncreasingRange(right);
-		BlockPos basepos = blockInCrosshair();
+		BlockPos crosshairBlock = blockInCrosshair();
 
 		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
 			for (int r = rightTuple.start; r < rightTuple.end; r++) {
 				for (int u = upTuple.start; u < upTuple.end; u++) {
 					// FIXME Write to file
-					BlockPos pos = basepos
-							.add(relativeToAbsoluteOffset(f, r, u));
+					BlockPos pos = crosshairBlock.add(relativeToAbsoluteOffset(
+							f, r, u));
 
 					int blockid = Block.getIdFromBlock(world.getBlockState(pos)
 							.getBlock());
@@ -76,13 +77,11 @@ public class BuildingSaver {
 
 	public void build(String name, int verticalOffset)
 			throws FileNotFoundException {
-		BlockPos crosshairPos = blockInCrosshair();
-		System.out.println("Building at " + crosshairPos);
+		BlockPos crosshairBlock = blockInCrosshair();
 
 		Scanner scanner = new Scanner(new File(BUILDING_DIR + name));
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			System.out.println("Reading line " + line);
 			String[] lineparts = line.split(",");
 
 			int forwardOffset = Integer.parseInt(lineparts[0]);
@@ -92,9 +91,8 @@ public class BuildingSaver {
 
 			BlockPos offset = relativeToAbsoluteOffset(forwardOffset, upOffset,
 					rightOffset);
-			BlockPos placementPos = crosshairPos.add(offset);
+			BlockPos placementPos = crosshairBlock.add(offset);
 			IBlockState block = Block.getStateById(blockType);
-			System.out.println("Putting " + block + " at " + placementPos);
 			world.setBlockState(placementPos.up(verticalOffset), block);
 		}
 		scanner.close();
