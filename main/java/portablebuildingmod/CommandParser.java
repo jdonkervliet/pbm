@@ -76,17 +76,18 @@ public class CommandParser {
 	private void parseBuildCommand(List<String> command)
 			throws InvalidPBMCommandException {
 		System.out.println("Build command.");
-		if (command.size() == 1) {
-			if (new File(BuildingSaver.BUILDING_DIR + command.get(0)).exists()) {
-				System.out.println("Calling build.");
-				try {
+		if (command.size() == 1 || command.size() == 2) {
+			System.out.println("Calling build.");
+			try {
+				if (command.size() == 1) {
 					builder.build(command.get(0));
-				} catch (FileNotFoundException e) {
-					// FIXME This should not happen, we just checked.
-					e.printStackTrace();
+				} else if (command.size() == 2) {
+					builder.build(command.get(0),
+							Integer.parseInt(command.get(1)));
 				}
-			} else {
+			} catch (FileNotFoundException e) {
 				System.out.println("Cannot find file " + command.get(0));
+				throw new InvalidPBMCommandException();
 			}
 		} else {
 			throw new InvalidPBMCommandException();

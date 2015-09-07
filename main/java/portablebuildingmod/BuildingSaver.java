@@ -79,6 +79,11 @@ public class BuildingSaver {
 	}
 
 	public void build(String name) throws FileNotFoundException {
+		build(name, 1);
+	}
+
+	public void build(String name, int verticalOffset)
+			throws FileNotFoundException {
 		BlockPos crosshairPos = blockInCrosshair();
 		System.out.println("Building at " + crosshairPos);
 
@@ -98,7 +103,7 @@ public class BuildingSaver {
 			BlockPos placementPos = crosshairPos.add(offset);
 			IBlockState block = Block.getStateById(blockType);
 			System.out.println("Putting " + block + " at " + placementPos);
-			world.setBlockState(placementPos, block);
+			world.setBlockState(placementPos.up(verticalOffset), block);
 		}
 		scanner.close();
 	}
