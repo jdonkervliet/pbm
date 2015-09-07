@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockTorch;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
@@ -60,10 +62,13 @@ public class BuildingSaver {
 					BlockPos pos = crosshairBlock.add(relativeToAbsoluteOffset(
 							f, r, u));
 
-					int blockid = Block.getIdFromBlock(world.getBlockState(pos)
-							.getBlock());
-					writer.println(String.format("%d,%d,%d,%d", f, r, u,
-							blockid));
+					IBlockState blockState = world.getBlockState(pos);
+					EnumFacing facing = (EnumFacing) blockState.getProperties()
+							.get(PropertyDirection.create("facing"));
+
+					int blockid = Block.getIdFromBlock(blockState.getBlock());
+					writer.println(String.format("%d,%d,%d,%d,%s", f, r, u,
+							blockid, facing));
 				}
 			}
 		}
@@ -89,11 +94,21 @@ public class BuildingSaver {
 			int rightOffset = Integer.parseInt(lineparts[2]);
 			int blockType = Integer.parseInt(lineparts[3]);
 
+			EnumFacing facing = null;
+			if (lineparts[4] != "null") {
+				facing = EnumFacing.byName(lineparts[4]);
+			}
+
 			BlockPos offset = relativeToAbsoluteOffset(forwardOffset, upOffset,
 					rightOffset);
 			BlockPos placementPos = crosshairBlock.add(offset);
 			IBlockState block = Block.getStateById(blockType);
-			world.setBlockState(placementPos.up(verticalOffset), block);
+			if (block.getBlock() instanceof BlockTorch) {
+				world.setBlockState(placementPos.up(verticalOffset),
+						block.withProperty(BlockTorch.FACING, facing));
+			} else {
+				world.setBlockState(placementPos.up(verticalOffset), block);
+			}
 		}
 		scanner.close();
 	}
