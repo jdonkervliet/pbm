@@ -47,13 +47,11 @@ public class CommandParser {
 				right = Integer.parseInt(command.get(2));
 				up = Integer.parseInt(command.get(3));
 			} catch (NumberFormatException e) {
-				System.out.println("###");
 				throw new InvalidPBMCommandException();
 			}
 
 			builder.saveRelative(name, forward, right, up);
 		} else {
-			System.out.println("@@@");
 			throw new InvalidPBMCommandException();
 		}
 	}
