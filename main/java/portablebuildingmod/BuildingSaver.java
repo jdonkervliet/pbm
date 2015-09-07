@@ -125,29 +125,7 @@ public class BuildingSaver {
 	}
 
 	private BlockPos absoluteToRelativeOffset(int x, int y, int z) {
-		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
-				.getHorizontalFacing();
-
-		BlockPos position = new BlockPos(0, y, 0);
-
-		switch (facing) {
-		case EAST:
-			position = position.add(z, 0, x);
-			break;
-		case WEST:
-			position = position.add(-z, 0, -x);
-			break;
-		case NORTH:
-			position = position.add(x, 0, -z);
-			break;
-		case SOUTH:
-			position = position.add(-x, 0, z);
-			break;
-		default:
-			// FIXME ERR
-			break;
-		}
-		return position;
+		return relativeToAbsoluteOffset(z, x, y);
 	}
 
 	private BlockPos relativeToAbsoluteOffset(int forward, int right, int up) {
