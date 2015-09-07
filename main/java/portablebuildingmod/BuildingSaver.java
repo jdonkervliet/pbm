@@ -24,13 +24,13 @@ public class BuildingSaver {
 	}
 
 	public void deleteRelative(int forward, int right, int up) {
-		Position offset = relativeToAbsoluteOffset(forward, right, up);
-		delete(offset.x, offset.y, offset.z);
+		BlockPos offset = relativeToAbsoluteOffset(forward, right, up);
+		delete(offset.getX(), offset.getY(), offset.getZ());
 	}
 
 	public void saveRelative(String name, int forward, int right, int up) {
-		Position offset = relativeToAbsoluteOffset(forward, right, up);
-		save(name, offset.x, offset.y, offset.z);
+		BlockPos offset = relativeToAbsoluteOffset(forward, right, up);
+		save(name, offset.getX(), offset.getY(), offset.getZ());
 	}
 
 	public void delete(int xdir, int ydir, int zdir) {
@@ -93,9 +93,9 @@ public class BuildingSaver {
 			int zoffset = Integer.parseInt(lineparts[2]);
 			int blockType = Integer.parseInt(lineparts[3]);
 
-			BlockPos placementPos = relativeToAbsoluteOffset(
-					new Position(crosshairPos.add(xoffset, yoffset, zoffset)))
-					.toBlockPos();
+			BlockPos offset = absoluteToRelativeOffset(xoffset, yoffset,
+					zoffset);
+			BlockPos placementPos = crosshairPos.add(offset);
 			IBlockState block = Block.getStateById(blockType);
 			System.out.println("Putting " + block + " at " + placementPos);
 			world.setBlockState(placementPos, block);
@@ -124,33 +124,50 @@ public class BuildingSaver {
 		world.setBlockToAir(pos);
 	}
 
-	private Position relativeToAbsoluteOffset(Position p) {
-		return relativeToAbsoluteOffset(p.x, p.z, p.y);
-	}
-
-	private Position relativeToAbsoluteOffset(int forward, int right, int up) {
+	private BlockPos absoluteToRelativeOffset(int x, int y, int z) {
 		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
 				.getHorizontalFacing();
 
-		Position position = new Position();
-		position.y = up;
+		BlockPos position = new BlockPos(0, y, 0);
 
 		switch (facing) {
 		case EAST:
-			position.x = forward;
-			position.z = right;
+			position = position.add(z, 0, x);
 			break;
 		case WEST:
-			position.x = -forward;
-			position.z = -right;
+			position = position.add(-z, 0, -x);
 			break;
 		case NORTH:
-			position.x = right;
-			position.z = -forward;
+			position = position.add(x, 0, -z);
 			break;
 		case SOUTH:
-			position.x = -right;
-			position.z = forward;
+			position = position.add(-x, 0, z);
+			break;
+		default:
+			// FIXME ERR
+			break;
+		}
+		return position;
+	}
+
+	private BlockPos relativeToAbsoluteOffset(int forward, int right, int up) {
+		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
+				.getHorizontalFacing();
+
+		BlockPos position = new BlockPos(0, up, 0);
+
+		switch (facing) {
+		case EAST:
+			position = position.add(forward, 0, right);
+			break;
+		case WEST:
+			position = position.add(-forward, 0, -right);
+			break;
+		case NORTH:
+			position = position.add(right, 0, -forward);
+			break;
+		case SOUTH:
+			position = position.add(-right, 0, forward);
 			break;
 		default:
 			// FIXME ERR
@@ -167,25 +184,4 @@ public class BuildingSaver {
 			this.end = end;
 		}
 	}
-
-	public class Position {
-		protected int x, y, z;
-
-		public Position() {
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-		}
-
-		public Position(BlockPos blockPos) {
-			this.x = blockPos.getX();
-			this.y = blockPos.getY();
-			this.z = blockPos.getZ();
-		}
-
-		public BlockPos toBlockPos() {
-			return new BlockPos(x, y, z);
-		}
-	}
-
 }
