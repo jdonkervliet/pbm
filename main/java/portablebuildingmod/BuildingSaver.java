@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
@@ -64,11 +63,13 @@ public class BuildingSaver {
 
 					IBlockState blockState = world.getBlockState(pos);
 					EnumFacing facing = (EnumFacing) blockState.getProperties()
-							.get(PropertyDirection.create("facing"));
+							.get(BlockTorch.FACING);
+					RelativeFacing relativeFacing = facing != null ? absoluteToRelativeFacing(facing)
+							: RelativeFacing.NONE;
 
 					int blockid = Block.getIdFromBlock(blockState.getBlock());
 					writer.println(String.format("%d,%d,%d,%d,%s", f, r, u,
-							blockid, facing));
+							blockid, relativeFacing.toString()));
 				}
 			}
 		}
@@ -83,8 +84,9 @@ public class BuildingSaver {
 	public void build(String name, int verticalOffset)
 			throws FileNotFoundException {
 		BlockPos crosshairBlock = blockInCrosshair();
-
 		Scanner scanner = new Scanner(new File(BUILDING_DIR + name));
+		Structure structure = new Structure();
+
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			String[] lineparts = line.split(",");
@@ -94,23 +96,22 @@ public class BuildingSaver {
 			int rightOffset = Integer.parseInt(lineparts[2]);
 			int blockType = Integer.parseInt(lineparts[3]);
 
-			EnumFacing facing = null;
-			if (lineparts[4] != "null") {
-				facing = EnumFacing.byName(lineparts[4]);
-			}
-
+			RelativeFacing facing = RelativeFacing.valueOf(lineparts[4]);
 			BlockPos offset = relativeToAbsoluteOffset(forwardOffset, upOffset,
 					rightOffset);
-			BlockPos placementPos = crosshairBlock.add(offset);
 			IBlockState block = Block.getStateById(blockType);
-			if (block.getBlock() instanceof BlockTorch) {
-				world.setBlockState(placementPos.up(verticalOffset),
-						block.withProperty(BlockTorch.FACING, facing));
-			} else {
-				world.setBlockState(placementPos.up(verticalOffset), block);
+
+			if (!facing.equals(RelativeFacing.NONE)
+					&& block.getBlock() instanceof BlockTorch) {
+				block = block.withProperty(BlockTorch.FACING,
+						relativeToAbsoluteFacing(facing));
 			}
+
+			structure.addBlockAtPosition(new BlockAtPosition(block, offset
+					.up(verticalOffset)));
 		}
 		scanner.close();
+		structure.build(world, crosshairBlock);
 	}
 
 	private Tuple getIncreasingRange(int number) {
@@ -132,6 +133,46 @@ public class BuildingSaver {
 		Block block = world.getBlockState(pos).getBlock();
 		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
 		world.setBlockToAir(pos);
+	}
+
+	private RelativeFacing absoluteToRelativeFacing(EnumFacing facing) {
+		if (facing.equals(EnumFacing.UP)) {
+			return RelativeFacing.UP;
+		} else if (facing.equals(EnumFacing.DOWN)) {
+			return RelativeFacing.DOWN;
+		}
+
+		EnumFacing playerFacing = Minecraft.getMinecraft()
+				.getRenderViewEntity().getHorizontalFacing();
+
+		int distance = (facing.getHorizontalIndex() - playerFacing
+				.getHorizontalIndex()) % 4;
+		if (distance < 0) {
+			distance += 4;
+		}
+
+		return RelativeFacing.HORIZONTALS[distance];
+	}
+
+	private EnumFacing relativeToAbsoluteFacing(RelativeFacing facing) {
+		if (facing.equals(RelativeFacing.UP)) {
+			return EnumFacing.UP;
+		} else if (facing.equals(RelativeFacing.DOWN)) {
+			return EnumFacing.DOWN;
+		}
+
+		EnumFacing playerFacing = Minecraft.getMinecraft()
+				.getRenderViewEntity().getHorizontalFacing();
+
+		int index;
+		for (index = 0; index < RelativeFacing.HORIZONTALS.length; index++) {
+			if (RelativeFacing.HORIZONTALS[index].equals(facing)) {
+				break;
+			}
+		}
+
+		return EnumFacing
+				.getHorizontal((playerFacing.getHorizontalIndex() + index) % 4);
 	}
 
 	private BlockPos relativeToAbsoluteOffset(int forward, int right, int up) {
