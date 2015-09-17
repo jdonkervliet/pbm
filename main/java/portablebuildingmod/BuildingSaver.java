@@ -2,6 +2,7 @@ package portablebuildingmod;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -18,7 +19,8 @@ import net.minecraft.world.World;
 
 public class BuildingSaver {
 
-	public static String BUILDING_DIR = "/tmp/";
+	public static String BUILDING_DIR = System.getProperty("user.home")
+			+ "/.minecraft/pbm/";
 
 	World world;
 
@@ -44,11 +46,14 @@ public class BuildingSaver {
 
 	public void save(String name, int forward, int right, int up) {
 		PrintWriter writer = null;
-
 		try {
-			writer = new PrintWriter(BUILDING_DIR + name);
+			writer = getBuildingWriter(name);
 		} catch (FileNotFoundException e) {
-			// FIXME care about this.
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		Tuple forwardTuple = getIncreasingRange(forward);
@@ -85,6 +90,18 @@ public class BuildingSaver {
 		}
 
 		writer.close();
+	}
+
+	private PrintWriter getBuildingWriter(String filename)
+			throws FileNotFoundException, IOException {
+		PrintWriter writer = null;
+		File savedir = new File(BUILDING_DIR);
+		if (!savedir.exists()) {
+			savedir.mkdir();
+		}
+		writer = new PrintWriter(
+				new File(BUILDING_DIR + filename).getCanonicalPath());
+		return writer;
 	}
 
 	private boolean shouldBeSaved(IBlockState blockState) {
