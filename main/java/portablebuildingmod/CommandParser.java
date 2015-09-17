@@ -29,7 +29,6 @@ public class CommandParser {
 			} else if (command.get(0).equals(MOD_BUILD_COMMAND)) {
 				parseBuildCommand(command.subList(1, command.size()));
 			} else {
-				System.out.println("[[[");
 				throw new InvalidPBMCommandException();
 			}
 		} catch (InvalidPBMCommandException e) {
@@ -75,9 +74,7 @@ public class CommandParser {
 
 	private void parseBuildCommand(List<String> command)
 			throws InvalidPBMCommandException {
-		System.out.println("Build command.");
 		if (command.size() == 1 || command.size() == 2) {
-			System.out.println("Calling build.");
 			try {
 				if (command.size() == 1) {
 					builder.build(command.get(0));

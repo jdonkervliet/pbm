@@ -20,7 +20,7 @@ public class BlockAtPosition {
 		this.position = position;
 	}
 
-	public IBlockState getBlock() {
+	public IBlockState getBlockState() {
 		return block;
 	}
 

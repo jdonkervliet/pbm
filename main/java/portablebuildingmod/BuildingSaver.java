@@ -6,7 +6,9 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockTorch;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
@@ -62,8 +64,16 @@ public class BuildingSaver {
 							f, r, u));
 
 					IBlockState blockState = world.getBlockState(pos);
-					EnumFacing facing = (EnumFacing) blockState.getProperties()
-							.get(BlockTorch.FACING);
+					if (!shouldBeSaved(blockState)) {
+						continue;
+					}
+
+					PropertyDirection propertyDirection = getPropertyDirectionFromBlockState(blockState);
+					EnumFacing facing = null;
+					if (propertyDirection != null) {
+						facing = (EnumFacing) blockState
+								.getValue(propertyDirection);
+					}
 					RelativeFacing relativeFacing = facing != null ? absoluteToRelativeFacing(facing)
 							: RelativeFacing.NONE;
 
@@ -75,6 +85,15 @@ public class BuildingSaver {
 		}
 
 		writer.close();
+	}
+
+	private boolean shouldBeSaved(IBlockState blockState) {
+		if ((blockState.getBlock() instanceof BlockDoor)
+				&& blockState.getValue(BlockDoor.HALF).equals(
+						BlockDoor.EnumDoorHalf.UPPER)) {
+			return false;
+		}
+		return true;
 	}
 
 	public void build(String name) throws FileNotFoundException {
@@ -101,10 +120,12 @@ public class BuildingSaver {
 					rightOffset);
 			IBlockState block = Block.getStateById(blockType);
 
-			if (!facing.equals(RelativeFacing.NONE)
-					&& block.getBlock() instanceof BlockTorch) {
-				block = block.withProperty(BlockTorch.FACING,
-						relativeToAbsoluteFacing(facing));
+			if (!facing.equals(RelativeFacing.NONE)) {
+				PropertyDirection propertyDirection = getPropertyDirectionFromBlockState(block);
+				if (propertyDirection != null) {
+					block = block.withProperty(propertyDirection,
+							relativeToAbsoluteFacing(facing));
+				}
 			}
 
 			structure.addBlockAtPosition(new BlockAtPosition(block, offset
@@ -112,6 +133,18 @@ public class BuildingSaver {
 		}
 		scanner.close();
 		structure.build(world, crosshairBlock);
+	}
+
+	private PropertyDirection getPropertyDirectionFromBlockState(
+			IBlockState blockState) {
+		Block block = blockState.getBlock();
+		if (block instanceof BlockTorch) {
+			return BlockTorch.FACING;
+		} else if (block instanceof BlockDoor) {
+			return BlockDoor.FACING;
+		} else {
+			return null;
+		}
 	}
 
 	private Tuple getIncreasingRange(int number) {

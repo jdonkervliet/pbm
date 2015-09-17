@@ -7,7 +7,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemDoor;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class Structure {
@@ -22,7 +24,7 @@ public class Structure {
 	}
 
 	public void addBlockAtPosition(BlockAtPosition blockAtPos) {
-		Block block = blockAtPos.getBlock().getBlock();
+		Block block = blockAtPos.getBlockState().getBlock();
 		if (block instanceof BlockTorch || block instanceof BlockDoor) {
 			delayedBlocks.add(blockAtPos);
 		} else {
@@ -38,9 +40,16 @@ public class Structure {
 	private void build(World world, BlockPos offset,
 			List<BlockAtPosition> blocksAtPositions) {
 		for (BlockAtPosition blockAtPos : blocksAtPositions) {
-			BlockPos placementPos = blockAtPos.getPosition();
-			IBlockState block = blockAtPos.getBlock();
-			world.setBlockState(placementPos.add(offset), block);
+			BlockPos placementPos = blockAtPos.getPosition().add(offset);
+			IBlockState blockState = blockAtPos.getBlockState();
+			Block block = blockState.getBlock();
+			if (block instanceof BlockDoor) {
+				ItemDoor.placeDoor(world, placementPos,
+						(EnumFacing) blockState.getValue(BlockDoor.FACING),
+						block);
+			} else {
+				world.setBlockState(placementPos, blockState);
+			}
 		}
 	}
 }
