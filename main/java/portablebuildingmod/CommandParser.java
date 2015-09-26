@@ -1,6 +1,5 @@
 package portablebuildingmod;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -8,6 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
+/**
+ * Parses PBM commands from Minecraft.
+ *
+ */
 public class CommandParser {
 
 	public static final String MOD_DELETE_COMMAND = "delete";
@@ -20,6 +23,12 @@ public class CommandParser {
 		this.builder = new BuildingSaver();
 	}
 
+	/**
+	 * Parse a command where each argument is an element in the given list.
+	 * 
+	 * @param command
+	 *            The command and its arguments.
+	 */
 	public void parseCommand(List<String> command) {
 		try {
 			if (command.get(0).equals(MOD_DELETE_COMMAND)) {

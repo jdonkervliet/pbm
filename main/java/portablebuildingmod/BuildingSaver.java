@@ -19,15 +19,36 @@ import net.minecraft.world.World;
 
 public class BuildingSaver {
 
+	/**
+	 * Directory to save buildings/structures.
+	 */
 	public static String BUILDING_DIR = System.getProperty("user.home")
 			+ "/.minecraft/pbm/";
 
 	World world;
 
+	/**
+	 * Create a new BuildingSaver using the {@link MinecraftServer} world
+	 * object.
+	 */
 	public BuildingSaver() {
 		this.world = MinecraftServer.getServer().getEntityWorld();
 	}
 
+	/**
+	 * Delete one or multiple blocks in the world. A 3-dimensional box is
+	 * defined through the given parameters. All blocks in this box are deleted.
+	 * One of the end points of the box is the block the player is looking at.
+	 * The diagonal end point of the box is defined through the given
+	 * parameters.
+	 * 
+	 * @param forward
+	 *            The size of the box in the 'forward' dimension.
+	 * @param right
+	 *            The size of the box in the 'right' dimension.
+	 * @param up
+	 *            The size of the box in the 'up' direction.
+	 */
 	public void delete(int forward, int right, int up) {
 		Tuple forwardTuple = getIncreasingRange(forward);
 		Tuple upTuple = getIncreasingRange(up);
@@ -44,6 +65,23 @@ public class BuildingSaver {
 		}
 	}
 
+	/**
+	 * Save a box of blocks on disk.
+	 * 
+	 * @param name
+	 *            The name the player assigns to the structure to save. A
+	 *            3-dimensional box is defined through the given parameters. All
+	 *            blocks in this box are saved as a structure. One of the end
+	 *            points of the box is the block the player is looking at. The
+	 *            diagonal end point of the box is defined through the given
+	 *            parameters.
+	 * @param forward
+	 *            The size of the box in the 'forward' dimension.
+	 * @param right
+	 *            The size of the box in the 'right' dimension.
+	 * @param up
+	 *            The size of the box in the 'up' direction.
+	 */
 	public void save(String name, int forward, int right, int up) {
 		PrintWriter writer = null;
 		try {
@@ -64,7 +102,6 @@ public class BuildingSaver {
 		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
 			for (int r = rightTuple.start; r < rightTuple.end; r++) {
 				for (int u = upTuple.start; u < upTuple.end; u++) {
-					// FIXME Write to file
 					BlockPos pos = crosshairBlock.add(relativeToAbsoluteOffset(
 							f, r, u));
 
@@ -92,18 +129,35 @@ public class BuildingSaver {
 		writer.close();
 	}
 
-	private PrintWriter getBuildingWriter(String filename)
-			throws FileNotFoundException, IOException {
+	/**
+	 * Creates a {@link PrintWriter} that writes to the given filename. If the
+	 * file or one of the parent directories does not exist, it is created.
+	 * 
+	 * @param filename
+	 *            The filename of the file to write to.
+	 * @return A {@link PrintWriter} that prints to the specified file.
+	 * @throws IOException
+	 *             If something goes wrong with IO.
+	 */
+	private PrintWriter getBuildingWriter(String filename) throws IOException {
 		PrintWriter writer = null;
 		File savedir = new File(BUILDING_DIR);
 		if (!savedir.exists()) {
-			savedir.mkdir();
+			savedir.mkdirs();
 		}
 		writer = new PrintWriter(
 				new File(BUILDING_DIR + filename).getCanonicalPath());
 		return writer;
 	}
 
+	/**
+	 * Checks if a {@link IBlockState} should be saved in the structure file or
+	 * not.
+	 * 
+	 * @param blockState
+	 *            The block state to check.
+	 * @return <code>true</code> iff the block state should be saved to disk.
+	 */
 	private boolean shouldBeSaved(IBlockState blockState) {
 		if ((blockState.getBlock() instanceof BlockDoor)
 				&& blockState.getValue(BlockDoor.HALF).equals(
@@ -113,10 +167,34 @@ public class BuildingSaver {
 		return true;
 	}
 
+	/**
+	 * Builds the structure that is specified by the given name. The building is
+	 * placed at the block the player is looking at, with an additional vertical
+	 * offset of 1. As an example, if the player looks at the ground while this
+	 * command is called, the building is build on top of the ground, in stead
+	 * of replacing it.
+	 * 
+	 * @param name
+	 *            The name of the structure to build.
+	 * @throws FileNotFoundException
+	 *             If the structure file can not be found.
+	 */
 	public void build(String name) throws FileNotFoundException {
 		build(name, 1);
 	}
 
+	/**
+	 * Builds the structure that is specified by the given name. The building is
+	 * placed at the block the player is looking at.
+	 * 
+	 * @param name
+	 *            The name of the structure to build.
+	 * @param verticalOffset
+	 *            The vertical offset to use when placing the structure. A
+	 *            positive offset raised the building up.
+	 * @throws FileNotFoundException
+	 *             If the structure file can not be found.
+	 */
 	public void build(String name, int verticalOffset)
 			throws FileNotFoundException {
 		BlockPos crosshairBlock = blockInCrosshair();
@@ -152,6 +230,15 @@ public class BuildingSaver {
 		structure.build(world, crosshairBlock);
 	}
 
+	/**
+	 * Returns the matching {@link PropertyDirection} from a given
+	 * {@link IBlockState}. If the given block state does not contain a 'facing'
+	 * property the method returns <code>null</code>.
+	 * 
+	 * @param blockState
+	 *            The block state to check for a 'facing' property.
+	 * @return The direction property that corresponds to the given block state.
+	 */
 	private PropertyDirection getPropertyDirectionFromBlockState(
 			IBlockState blockState) {
 		Block block = blockState.getBlock();
@@ -164,6 +251,14 @@ public class BuildingSaver {
 		}
 	}
 
+	/**
+	 * Get an increasing range of numbers between [0,number] if
+	 * <code>number</code> > 0, or [number + 1, 1] if <code>number</code> < 0.
+	 * 
+	 * @param number
+	 *            One end of the range. Can be both positive and negative.
+	 * @return An increasing range of numbers.
+	 */
 	private Tuple getIncreasingRange(int number) {
 		if (number > 0) {
 			return new Tuple(0, number);
@@ -174,17 +269,33 @@ public class BuildingSaver {
 		}
 	}
 
+	/**
+	 * @return Return the {@link BlockPos} the player is looking at.
+	 */
 	private BlockPos blockInCrosshair() {
 		return Minecraft.getMinecraft().getRenderViewEntity()
 				.rayTrace(200, 1.0F).getBlockPos();
 	}
 
+	/**
+	 * Replace the current block at the given {@link BlockPos} with air.
+	 * 
+	 * @param pos
+	 *            The block position to replace.
+	 */
 	private void breakBlock(BlockPos pos) {
 		Block block = world.getBlockState(pos).getBlock();
 		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
 		world.setBlockToAir(pos);
 	}
 
+	/**
+	 * Converts an {@link EnumFacing} to a {@link RelativeFacing}.
+	 * 
+	 * @param facing
+	 *            The {@link EnumFacing} to convert.
+	 * @return The matching {@link RelativeFacing}
+	 */
 	private RelativeFacing absoluteToRelativeFacing(EnumFacing facing) {
 		if (facing.equals(EnumFacing.UP)) {
 			return RelativeFacing.UP;
@@ -204,6 +315,13 @@ public class BuildingSaver {
 		return RelativeFacing.HORIZONTALS[distance];
 	}
 
+	/**
+	 * Converts a {@link RelativeFacing} to a {@link EnumFacing}.
+	 * 
+	 * @param facing
+	 *            The {@link RelativeFacing} to convert.
+	 * @return The matching {@link EnumFacing}.
+	 */
 	private EnumFacing relativeToAbsoluteFacing(RelativeFacing facing) {
 		if (facing.equals(RelativeFacing.UP)) {
 			return EnumFacing.UP;
@@ -225,6 +343,18 @@ public class BuildingSaver {
 				.getHorizontal((playerFacing.getHorizontalIndex() + index) % 4);
 	}
 
+	/**
+	 * Translates a relative offset (forward, right, up) to a relative offset
+	 * (x, y, z).
+	 * 
+	 * @param forward
+	 *            The number of blocks in the forward direction.
+	 * @param right
+	 *            The number of blocks to the right.
+	 * @param up
+	 *            The number of blocks up.
+	 * @return An absolute offset in terms of x, y, and z.
+	 */
 	private BlockPos relativeToAbsoluteOffset(int forward, int right, int up) {
 		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
 				.getHorizontalFacing();
@@ -251,6 +381,10 @@ public class BuildingSaver {
 		return position;
 	}
 
+	/**
+	 * Tiny class to make ranges easier.
+	 *
+	 */
 	public class Tuple {
 		protected int start, end;
 

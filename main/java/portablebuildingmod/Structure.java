@@ -12,6 +12,10 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+/**
+ * A structure is a collection of {@link BlockAtPosition} objects.
+ *
+ */
 public class Structure {
 	List<BlockAtPosition> blocks;
 	List<BlockAtPosition> delayedBlocks;
@@ -23,6 +27,12 @@ public class Structure {
 		delayedBlocks = new ArrayList<BlockAtPosition>();
 	}
 
+	/**
+	 * Add a block at a position.
+	 * 
+	 * @param blockAtPos
+	 *            The {@link BlockAtPosition} to add.
+	 */
 	public void addBlockAtPosition(BlockAtPosition blockAtPos) {
 		Block block = blockAtPos.getBlockState().getBlock();
 		if (block instanceof BlockTorch || block instanceof BlockDoor) {
@@ -32,6 +42,14 @@ public class Structure {
 		}
 	}
 
+	/**
+	 * Places the structure in the given world at the given offset.
+	 * 
+	 * @param world
+	 *            The world in which to build the structure.
+	 * @param offset
+	 *            The offset from the origin where to place the structure.
+	 */
 	public void build(World world, BlockPos offset) {
 		build(world, offset, blocks);
 		build(world, offset, delayedBlocks);

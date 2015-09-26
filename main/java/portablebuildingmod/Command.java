@@ -9,6 +9,10 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Registers the PBM mod commands in Minecraft.
+ *
+ */
 public class Command implements ICommand {
 
 	private List<String> aliases;
