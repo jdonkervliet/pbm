@@ -9,7 +9,7 @@ import net.minecraft.util.BlockPos;
  *
  */
 public class BlockAtPosition {
-	BlockPos position;
+	Offset offset;
 	IBlockState block;
 
 	/**
@@ -18,16 +18,16 @@ public class BlockAtPosition {
 	 * @param position
 	 *            The {@link BlockPos} of the block state.
 	 */
-	public BlockAtPosition(IBlockState block, BlockPos position) {
+	public BlockAtPosition(IBlockState block, Offset offset) {
 		this.block = block;
-		this.position = position;
+		this.offset = offset;
 	}
 
 	/**
-	 * @return The {@link BlockPos}.
+	 * @return The {@link Offset}.
 	 */
-	public BlockPos getPosition() {
-		return position;
+	public Offset getPosition() {
+		return offset;
 	}
 
 	/**
@@ -36,8 +36,8 @@ public class BlockAtPosition {
 	 * @param position
 	 *            The block position.
 	 */
-	public void setPosition(BlockPos position) {
-		this.position = position;
+	public void setPosition(Offset offset) {
+		this.offset = offset;
 	}
 
 	/**
