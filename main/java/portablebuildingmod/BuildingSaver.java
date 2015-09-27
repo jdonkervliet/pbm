@@ -32,6 +32,43 @@ public class BuildingSaver {
 	}
 
 	/**
+	 * Builds the structure that is specified by the given name. The building is
+	 * placed at the block the player is looking at, with an additional vertical
+	 * offset of 1. As an example, if the player looks at the ground while this
+	 * command is called, the building is build on top of the ground, in stead
+	 * of replacing it.
+	 * 
+	 * @param name
+	 *            The name of the structure to build.
+	 * @throws FileNotFoundException
+	 *             If the structure file can not be found.
+	 */
+	public void build(String name) throws FileNotFoundException {
+		build(name, 1);
+	}
+
+	/**
+	 * Builds the structure that is specified by the given name. The building is
+	 * placed at the block the player is looking at.
+	 * 
+	 * @param name
+	 *            The name of the structure to build.
+	 * @param verticalOffset
+	 *            The vertical offset to use when placing the structure. A
+	 *            positive offset raised the building up.
+	 * @throws FileNotFoundException
+	 *             If the structure file can not be found.
+	 */
+	public void build(String name, int verticalOffset)
+			throws FileNotFoundException {
+		BlockPos crosshairBlock = blockInCrosshair();
+		Scanner scanner = new Scanner(new File(BUILDING_DIR + name));
+		(new StructureIO().read(scanner)).build(world,
+				crosshairBlock.up(verticalOffset));
+		scanner.close();
+	}
+
+	/**
 	 * Delete one or multiple blocks in the world. A 3-dimensional box is
 	 * defined through the given parameters. All blocks in this box are deleted.
 	 * One of the end points of the box is the block the player is looking at.
@@ -99,6 +136,26 @@ public class BuildingSaver {
 	}
 
 	/**
+	 * @return Return the {@link BlockPos} the player is looking at.
+	 */
+	private BlockPos blockInCrosshair() {
+		return Minecraft.getMinecraft().getRenderViewEntity()
+				.rayTrace(200, 1.0F).getBlockPos();
+	}
+
+	/**
+	 * Replace the current block at the given {@link BlockPos} with air.
+	 * 
+	 * @param pos
+	 *            The block position to replace.
+	 */
+	private void breakBlock(BlockPos pos) {
+		Block block = world.getBlockState(pos).getBlock();
+		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
+		world.setBlockToAir(pos);
+	}
+
+	/**
 	 * Creates a {@link PrintWriter} that writes to the given filename. If the
 	 * file or one of the parent directories does not exist, it is created.
 	 * 
@@ -117,62 +174,5 @@ public class BuildingSaver {
 		writer = new PrintWriter(
 				new File(BUILDING_DIR + filename).getCanonicalPath());
 		return writer;
-	}
-
-	/**
-	 * Builds the structure that is specified by the given name. The building is
-	 * placed at the block the player is looking at, with an additional vertical
-	 * offset of 1. As an example, if the player looks at the ground while this
-	 * command is called, the building is build on top of the ground, in stead
-	 * of replacing it.
-	 * 
-	 * @param name
-	 *            The name of the structure to build.
-	 * @throws FileNotFoundException
-	 *             If the structure file can not be found.
-	 */
-	public void build(String name) throws FileNotFoundException {
-		build(name, 1);
-	}
-
-	/**
-	 * Builds the structure that is specified by the given name. The building is
-	 * placed at the block the player is looking at.
-	 * 
-	 * @param name
-	 *            The name of the structure to build.
-	 * @param verticalOffset
-	 *            The vertical offset to use when placing the structure. A
-	 *            positive offset raised the building up.
-	 * @throws FileNotFoundException
-	 *             If the structure file can not be found.
-	 */
-	public void build(String name, int verticalOffset)
-			throws FileNotFoundException {
-		BlockPos crosshairBlock = blockInCrosshair();
-		Scanner scanner = new Scanner(new File(BUILDING_DIR + name));
-		(new StructureIO().read(scanner)).build(world,
-				crosshairBlock.up(verticalOffset));
-		scanner.close();
-	}
-
-	/**
-	 * @return Return the {@link BlockPos} the player is looking at.
-	 */
-	private BlockPos blockInCrosshair() {
-		return Minecraft.getMinecraft().getRenderViewEntity()
-				.rayTrace(200, 1.0F).getBlockPos();
-	}
-
-	/**
-	 * Replace the current block at the given {@link BlockPos} with air.
-	 * 
-	 * @param pos
-	 *            The block position to replace.
-	 */
-	private void breakBlock(BlockPos pos) {
-		Block block = world.getBlockState(pos).getBlock();
-		block.dropBlockAsItem(world, pos, world.getBlockState(pos), 0);
-		world.setBlockToAir(pos);
 	}
 }

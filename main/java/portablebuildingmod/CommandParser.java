@@ -45,20 +45,20 @@ public class CommandParser {
 		}
 	}
 
-	private void parseSaveCommand(List<String> command)
+	private void parseBuildCommand(List<String> command)
 			throws InvalidPBMCommandException {
-		if (command.size() == 4 && command.get(0).matches("\\w+")) {
-			String name = command.get(0);
-			int forward, right, up;
+		if (command.size() == 1 || command.size() == 2) {
 			try {
-				forward = Integer.parseInt(command.get(1));
-				right = Integer.parseInt(command.get(2));
-				up = Integer.parseInt(command.get(3));
-			} catch (NumberFormatException e) {
+				if (command.size() == 1) {
+					builder.build(command.get(0));
+				} else if (command.size() == 2) {
+					builder.build(command.get(0),
+							Integer.parseInt(command.get(1)));
+				}
+			} catch (FileNotFoundException e) {
+				System.out.println("Cannot find file " + command.get(0));
 				throw new InvalidPBMCommandException();
 			}
-
-			builder.save(name, forward, right, up);
 		} else {
 			throw new InvalidPBMCommandException();
 		}
@@ -81,20 +81,20 @@ public class CommandParser {
 		}
 	}
 
-	private void parseBuildCommand(List<String> command)
+	private void parseSaveCommand(List<String> command)
 			throws InvalidPBMCommandException {
-		if (command.size() == 1 || command.size() == 2) {
+		if (command.size() == 4 && command.get(0).matches("\\w+")) {
+			String name = command.get(0);
+			int forward, right, up;
 			try {
-				if (command.size() == 1) {
-					builder.build(command.get(0));
-				} else if (command.size() == 2) {
-					builder.build(command.get(0),
-							Integer.parseInt(command.get(1)));
-				}
-			} catch (FileNotFoundException e) {
-				System.out.println("Cannot find file " + command.get(0));
+				forward = Integer.parseInt(command.get(1));
+				right = Integer.parseInt(command.get(2));
+				up = Integer.parseInt(command.get(3));
+			} catch (NumberFormatException e) {
 				throw new InvalidPBMCommandException();
 			}
+
+			builder.save(name, forward, right, up);
 		} else {
 			throw new InvalidPBMCommandException();
 		}

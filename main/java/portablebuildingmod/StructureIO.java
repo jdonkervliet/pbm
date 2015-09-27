@@ -95,6 +95,27 @@ public class StructureIO {
 	}
 
 	/**
+	 * Returns the matching {@link PropertyDirection} from a given
+	 * {@link IBlockState}. If the given block state does not contain a 'facing'
+	 * property the method returns <code>null</code>.
+	 * 
+	 * @param blockState
+	 *            The block state to check for a 'facing' property.
+	 * @return The direction property that corresponds to the given block state.
+	 */
+	private PropertyDirection getPropertyDirectionFromBlockState(
+			IBlockState blockState) {
+		Block block = blockState.getBlock();
+		if (block instanceof BlockTorch) {
+			return BlockTorch.FACING;
+		} else if (block instanceof BlockDoor) {
+			return BlockDoor.FACING;
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Converts a {@link RelativeFacing} to a {@link EnumFacing}.
 	 * 
 	 * @param facing
@@ -120,26 +141,5 @@ public class StructureIO {
 
 		return EnumFacing
 				.getHorizontal((playerFacing.getHorizontalIndex() + index) % 4);
-	}
-
-	/**
-	 * Returns the matching {@link PropertyDirection} from a given
-	 * {@link IBlockState}. If the given block state does not contain a 'facing'
-	 * property the method returns <code>null</code>.
-	 * 
-	 * @param blockState
-	 *            The block state to check for a 'facing' property.
-	 * @return The direction property that corresponds to the given block state.
-	 */
-	private PropertyDirection getPropertyDirectionFromBlockState(
-			IBlockState blockState) {
-		Block block = blockState.getBlock();
-		if (block instanceof BlockTorch) {
-			return BlockTorch.FACING;
-		} else if (block instanceof BlockDoor) {
-			return BlockDoor.FACING;
-		} else {
-			return null;
-		}
 	}
 }

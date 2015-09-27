@@ -80,6 +80,14 @@ public class Structure implements Iterable<BlockAtPosition> {
 		build(world, offset, delayedBlocks);
 	}
 
+	@Override
+	public Iterator<BlockAtPosition> iterator() {
+		List<BlockAtPosition> allBlocks = new ArrayList<BlockAtPosition>();
+		allBlocks.addAll(blocks);
+		allBlocks.addAll(delayedBlocks);
+		return allBlocks.listIterator();
+	}
+
 	private void build(World world, BlockPos offset,
 			List<BlockAtPosition> blocksAtPositions) {
 		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
@@ -99,14 +107,6 @@ public class Structure implements Iterable<BlockAtPosition> {
 				world.setBlockState(placementPos, blockState);
 			}
 		}
-	}
-
-	@Override
-	public Iterator<BlockAtPosition> iterator() {
-		List<BlockAtPosition> allBlocks = new ArrayList<BlockAtPosition>();
-		allBlocks.addAll(blocks);
-		allBlocks.addAll(delayedBlocks);
-		return allBlocks.listIterator();
 	}
 
 	/**

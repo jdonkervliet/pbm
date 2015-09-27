@@ -24,27 +24,17 @@ public class BlockAtPosition {
 	}
 
 	/**
-	 * @return The {@link Offset}.
-	 */
-	public Offset getPosition() {
-		return offset;
-	}
-
-	/**
-	 * Set the {@link BlockPos}.
-	 * 
-	 * @param position
-	 *            The block position.
-	 */
-	public void setPosition(Offset offset) {
-		this.offset = offset;
-	}
-
-	/**
 	 * @return The {@link IBlockState}.
 	 */
 	public IBlockState getBlockState() {
 		return block;
+	}
+
+	/**
+	 * @return The {@link Offset}.
+	 */
+	public Offset getPosition() {
+		return offset;
 	}
 
 	/**
@@ -55,5 +45,15 @@ public class BlockAtPosition {
 	 */
 	public void setBlock(IBlockState block) {
 		this.block = block;
+	}
+
+	/**
+	 * Set the {@link BlockPos}.
+	 * 
+	 * @param position
+	 *            The block position.
+	 */
+	public void setPosition(Offset offset) {
+		this.offset = offset;
 	}
 }

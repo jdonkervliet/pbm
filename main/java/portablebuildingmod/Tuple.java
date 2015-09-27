@@ -5,13 +5,6 @@ package portablebuildingmod;
  *
  */
 public class Tuple {
-	protected int start, end;
-
-	public Tuple(int start, int end) {
-		this.start = start;
-		this.end = end;
-	}
-
 	/**
 	 * Get an increasing range of numbers between [0,number] if
 	 * <code>number</code> > 0, or [number + 1, 1] if <code>number</code> < 0.
@@ -28,5 +21,12 @@ public class Tuple {
 		} else {
 			return new Tuple(0, 0);
 		}
+	}
+
+	protected int start, end;
+
+	public Tuple(int start, int end) {
+		this.start = start;
+		this.end = end;
 	}
 }

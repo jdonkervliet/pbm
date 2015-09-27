@@ -16,20 +16,20 @@ public class Offset {
 		return forward;
 	}
 
-	public void setForward(int forward) {
-		this.forward = forward;
-	}
-
 	public int getRight() {
 		return right;
 	}
 
-	public void setRight(int right) {
-		this.right = right;
-	}
-
 	public int getUp() {
 		return up;
+	}
+
+	public void setForward(int forward) {
+		this.forward = forward;
+	}
+
+	public void setRight(int right) {
+		this.right = right;
 	}
 
 	public void setUp(int up) {

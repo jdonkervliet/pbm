@@ -26,11 +26,6 @@ public class Command implements ICommand {
 	}
 
 	@Override
-	public int compareTo(Object arg0) {
-		return 0;
-	}
-
-	@Override
 	public List<String> addTabCompletionOptions(ICommandSender arg0,
 			String[] arg1, BlockPos arg2) {
 		return null;
@@ -39,6 +34,11 @@ public class Command implements ICommand {
 	@Override
 	public boolean canCommandSenderUse(ICommandSender arg0) {
 		return true;
+	}
+
+	@Override
+	public int compareTo(Object arg0) {
+		return 0;
 	}
 
 	@Override
