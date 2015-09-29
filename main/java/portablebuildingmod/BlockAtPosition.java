@@ -1,5 +1,6 @@
 package portablebuildingmod;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 
@@ -9,14 +10,20 @@ import net.minecraft.util.BlockPos;
  *
  */
 public class BlockAtPosition {
+	/**
+	 * Position of the block.
+	 */
 	Offset offset;
+	/**
+	 * The block itself.
+	 */
 	IBlockState block;
 
 	/**
 	 * @param block
 	 *            The {@link IBlockState}.
-	 * @param position
-	 *            The {@link BlockPos} of the block state.
+	 * @param offset
+	 *            The {@link Offset} of the block state.
 	 */
 	public BlockAtPosition(IBlockState block, Offset offset) {
 		this.block = block;
@@ -50,10 +57,15 @@ public class BlockAtPosition {
 	/**
 	 * Set the {@link BlockPos}.
 	 * 
-	 * @param position
-	 *            The block position.
+	 * @param offset
+	 *            The block offset.
 	 */
 	public void setPosition(Offset offset) {
 		this.offset = offset;
+	}
+
+	public String toString() {
+		return String.format("(%s) %d", offset,
+				Block.getIdFromBlock(block.getBlock()));
 	}
 }

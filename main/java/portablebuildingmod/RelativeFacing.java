@@ -7,5 +7,9 @@ package portablebuildingmod;
 public enum RelativeFacing {
 	NONE, DOWN, UP, AWAY, LEFT, TOWARDS, RIGHT;
 
+	/**
+	 * The horizontal facing directions.
+	 */
 	public static RelativeFacing[] HORIZONTALS = { AWAY, LEFT, TOWARDS, RIGHT };
 }
+	

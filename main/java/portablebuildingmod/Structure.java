@@ -19,17 +19,43 @@ import net.minecraft.world.World;
  *
  */
 public class Structure implements Iterable<BlockAtPosition> {
+	/**
+	 * The normal structure blocks.
+	 */
 	List<BlockAtPosition> blocks;
+	/**
+	 * The blocks that should be placed last (hanging objects, for instance).
+	 */
 	List<BlockAtPosition> delayedBlocks;
 
+	/**
+	 * Indicated the time it takes to build a single block, in survival mode.
+	 */
 	public static int BUILD_DELAY = 200;
 
+	/**
+	 * Create a new empty structure.
+	 */
 	public Structure() {
 		blocks = new ArrayList<BlockAtPosition>();
 		delayedBlocks = new ArrayList<BlockAtPosition>();
 	}
 
+	/**
+	 * Create a new structure by directly adding all blocks in the world between
+	 * the origin and the offset.
+	 * 
+	 * @param world
+	 *            The world from which to take the blocks.
+	 * @param origin
+	 *            The origin point.
+	 * @param offset
+	 *            The offset.
+	 */
 	public Structure(World world, BlockPos origin, Offset offset) {
+		blocks = new ArrayList<BlockAtPosition>();
+		delayedBlocks = new ArrayList<BlockAtPosition>();
+
 		EnumFacing facing = Minecraft.getMinecraft().getRenderViewEntity()
 				.getHorizontalFacing();
 
@@ -40,8 +66,9 @@ public class Structure implements Iterable<BlockAtPosition> {
 		for (int f = forwardTuple.start; f < forwardTuple.end; f++) {
 			for (int r = rightTuple.start; r < rightTuple.end; r++) {
 				for (int u = upTuple.start; u < upTuple.end; u++) {
-					IBlockState blockState = world.getBlockState(origin
-							.add(offset.toAbsoluteOffset(facing)));
+					IBlockState blockState = world
+							.getBlockState(origin.add((new Offset(f, r, u))
+									.toAbsoluteOffset(facing)));
 					this.addBlockAtPosition(new BlockAtPosition(blockState,
 							new Offset(f, r, u)));
 				}

@@ -10,8 +10,19 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
 
+/**
+ * Writes and reads structures to/from files.
+ *
+ */
 public class StructureIO {
 
+	/**
+	 * Read a structure from the given scanner.
+	 * 
+	 * @param scanner
+	 *            Used to read in the encoded structure.
+	 * @return The decoded structure.
+	 */
 	public Structure read(Scanner scanner) {
 
 		Structure structure = new Structure();
@@ -42,6 +53,13 @@ public class StructureIO {
 		return structure;
 	}
 
+	/**
+	 * Write the given structure to a string.
+	 * 
+	 * @param structure
+	 *            The structure to encode.
+	 * @return The encoded string.
+	 */
 	public String write(Structure structure) {
 		StringBuilder stringBuilder = new StringBuilder();
 

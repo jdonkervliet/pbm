@@ -13,7 +13,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-public class BuildingSaver {
+/**
+ * Builds {@link Structure} objects in the MineCraft world, or deletes parts of
+ * the world.
+ */
+public class Builder {
 
 	/**
 	 * Directory to save buildings/structures.
@@ -21,13 +25,16 @@ public class BuildingSaver {
 	public static String BUILDING_DIR = System.getProperty("user.home")
 			+ "/.minecraft/pbm/";
 
+	/**
+	 * The world to modify.
+	 */
 	World world;
 
 	/**
 	 * Create a new BuildingSaver using the {@link MinecraftServer} world
 	 * object.
 	 */
-	public BuildingSaver() {
+	public Builder() {
 		this.world = MinecraftServer.getServer().getEntityWorld();
 	}
 

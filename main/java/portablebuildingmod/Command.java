@@ -18,6 +18,9 @@ public class Command implements ICommand {
 	private List<String> aliases;
 	private CommandParser parser;
 
+	/**
+	 * Creates a new command.
+	 */
 	public Command() {
 		parser = new CommandParser(MinecraftServer.getServer().getEntityWorld());
 

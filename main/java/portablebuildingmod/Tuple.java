@@ -23,8 +23,23 @@ public class Tuple {
 		}
 	}
 
-	protected int start, end;
+	/**
+	 * First value.
+	 */
+	protected int start;
+	/**
+	 * Second value.
+	 */
+	protected int end;
 
+	/**
+	 * Create a new tuple with the given values.
+	 * 
+	 * @param start
+	 *            First value.
+	 * @param end
+	 *            Second value.
+	 */
 	public Tuple(int start, int end) {
 		this.start = start;
 		this.end = end;

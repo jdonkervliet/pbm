@@ -13,14 +13,30 @@ import net.minecraft.world.World;
  */
 public class CommandParser {
 
+	/**
+	 * Keyword to trigger the delete command.
+	 */
 	public static final String MOD_DELETE_COMMAND = "delete";
+	/**
+	 * Keyword to trigger the save command.
+	 */
 	public static final String MOD_SAVE_COMMAND = "save";
+	/**
+	 * Keyword to trigger the build command.
+	 */
 	public static final String MOD_BUILD_COMMAND = "build";
 
-	private BuildingSaver builder;
+	private Builder builder;
 
+	/**
+	 * Create a new command parser that executes the given commands on a given
+	 * world.
+	 * 
+	 * @param world
+	 *            The world.
+	 */
 	public CommandParser(World world) {
-		this.builder = new BuildingSaver();
+		this.builder = new Builder();
 	}
 
 	/**
